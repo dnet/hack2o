@@ -28,7 +28,23 @@
 
 #include <Stepper.h>
 
+#define HEIGHT 4800
+
+void move2bottom(Stepper *st) {
+	Serial.print("Moving to bottom position...");
+	while (digitalRead(7) == HIGH) st->step(-25);
+	Serial.println(" done");
+}
+
+void move2top(Stepper *st) {
+	Serial.print("Moving to top position...");
+	st->step(HEIGHT);
+	Serial.println(" done");
+}
+
 void setup() {
+	pinMode(7, INPUT);
+	digitalWrite(7, HIGH);
 	Serial.begin(9600);
 	Serial.print("Initializing Stepper library...");
 	Stepper myStepper(100, 8, 10, 9, 11);
@@ -36,81 +52,23 @@ void setup() {
 	Serial.print("Setting stepper speed...");
 	myStepper.setSpeed(300);
 	Serial.println(" done");
-	Serial.println("Please begin calibration by setting the lowest position.");
-	manual(&myStepper);
-	Serial.println();
-	Serial.println("Please continue by setting the highest postition");
-	int hg = manual(&myStepper);
-	Serial.println();
-	Serial.print("Calibration done, height is ");
-	Serial.print(hg);
-	Serial.println(", entering main loop");
+	move2bottom(&myStepper);
+	move2top(&myStepper);
+	Serial.println("Entering main loop");
 	while (1) {
 		Serial.println("Press any key to let the water flow");
 		while(!Serial.available());
 		while(Serial.available()) Serial.read();
-		flow(&myStepper, hg);
+		flow(&myStepper);
 	}
 }
 
-void flow(Stepper* st, int hg) {
-	Serial.print("Lowering pipe...");
-	st->step(-hg);
-	Serial.println(" done");
+void flow(Stepper* st) {
+	move2bottom(st);
 	Serial.print("Sleeping...");
 	delay(2000);
 	Serial.println(" done");
-	Serial.print("Lifting pipe...");
-	st->step(hg);
-	Serial.println(" done");
-}
-
-int manual(Stepper* st) {
-	int sum = 0, state = 0, dist, dir;
-	Serial.print("Please enter direction and distance (+ up / - down), 'q' quits: ");
-	while (1) {
-		while (!Serial.available());
-		int inp = Serial.read();
-		switch (state) {
-			case 0:
-				switch (inp) {
-					case '+':
-						dir = 1;
-						state = 1;
-						dist = 0;
-						Serial.write('+');
-						break;
-					case '-':
-						dir = -1;
-						state = 1;
-						dist = 0;
-						Serial.write('-');
-						break;
-					case 'q':
-						return sum;
-				}
-				break;
-			case 1:
-				if (inp == '\r' || inp == '\n') {
-					int d = dir * dist;
-					sum += d;
-					Serial.println();
-					Serial.print("Stepping by ");
-					Serial.print(d);
-					Serial.print("...");
-					st->step(d);
-					Serial.println(" done");
-					Serial.print("Please enter direction and distance (+ up / - down), 'q' quits: ");
-					state = 0;
-				}
-				if (inp <= '9' && inp >= '0') {
-					dist = dist * 10 + inp - '0';
-					Serial.write(inp);
-				}
-				break;
-		}
-	}
-	return sum;
+	move2top(st);
 }
 
 void loop() {}
