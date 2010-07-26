@@ -43,6 +43,8 @@ void move2top(Stepper *st) {
 }
 
 void setup() {
+	pinMode(6, INPUT);
+	digitalWrite(6, HIGH);
 	pinMode(7, INPUT);
 	digitalWrite(7, HIGH);
 	Serial.begin(9600);
@@ -56,9 +58,7 @@ void setup() {
 	move2top(&myStepper);
 	Serial.println("Entering main loop");
 	while (1) {
-		Serial.println("Press any key to let the water flow");
-		while(!Serial.available());
-		while(Serial.available()) Serial.read();
+		while(digitalRead(6) == HIGH); // wait till pin 6 goes LOW
 		flow(&myStepper);
 	}
 }
