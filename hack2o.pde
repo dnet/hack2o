@@ -44,7 +44,7 @@ void move2top(Stepper *st) {
 
 void setup() {
 	pinMode(6, INPUT);
-	digitalWrite(6, HIGH);
+	digitalWrite(6, LOW); // floating mode, pullup disabled
 	pinMode(7, INPUT);
 	digitalWrite(7, HIGH);
 	Serial.begin(9600);
@@ -58,7 +58,7 @@ void setup() {
 	move2top(&myStepper);
 	Serial.println("Entering main loop");
 	while (1) {
-		while(digitalRead(6) == HIGH); // wait till pin 6 goes LOW
+		while(digitalRead(6) != HIGH); // wait till pin 6 goes HIGH
 		flow(&myStepper);
 	}
 }
