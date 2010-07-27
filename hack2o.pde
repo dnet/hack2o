@@ -30,15 +30,17 @@
 
 #define HEIGHT 4800
 
-void move2bottom(Stepper *st) {
+Stepper myStepper(100, 8, 10, 9, 11);
+
+void move2bottom() {
 	Serial.print("Moving to bottom position...");
-	while (digitalRead(7) == HIGH) st->step(-25);
+	while (digitalRead(7) == HIGH) myStepper.step(-25);
 	Serial.println(" done");
 }
 
-void move2top(Stepper *st) {
+void move2top() {
 	Serial.print("Moving to top position...");
-	st->step(HEIGHT);
+	myStepper.step(HEIGHT);
 	Serial.println(" done");
 }
 
@@ -48,14 +50,11 @@ void setup() {
 	pinMode(7, INPUT);
 	digitalWrite(7, HIGH);
 	Serial.begin(9600);
-	Serial.print("Initializing Stepper library...");
-	Stepper myStepper(100, 8, 10, 9, 11);
-	Serial.println(" done");
 	Serial.print("Setting stepper speed...");
 	myStepper.setSpeed(300);
 	Serial.println(" done");
-	move2bottom(&myStepper);
-	move2top(&myStepper);
+	move2bottom();
+	move2top();
 	Serial.println("Entering main loop");
 	while (1) {
 		while(digitalRead(6) != HIGH); // wait till pin 6 goes HIGH
@@ -63,12 +62,12 @@ void setup() {
 	}
 }
 
-void flow(Stepper* st) {
-	move2bottom(st);
+void flow() {
+	move2bottom();
 	Serial.print("Sleeping...");
 	delay(2000);
 	Serial.println(" done");
-	move2top(st);
+	move2top();
 }
 
 void loop() {}
