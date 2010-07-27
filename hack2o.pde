@@ -27,10 +27,13 @@
  */
 
 #include <Stepper.h>
+#include <Wire.h>
 
 #define HEIGHT 4800
 
 Stepper myStepper(100, 8, 10, 9, 11);
+int i2cmd;
+int letgo = 0;
 
 void move2bottom() {
 	Serial.print("Moving to bottom position...");
@@ -44,11 +47,25 @@ void move2top() {
 	Serial.println(" done");
 }
 
+void recHandler(int numBytes) {
+	Serial.print("Received ");
+	Serial.print(numBytes, DEC);
+	Serial.println(" bytes");
+	if (numBytes == 0) return;
+	i2cmd = Wire.receive();
+}
+
+void reqHandler() {
+	letgo = 1;
+}
+
+
 void setup() {
-	pinMode(6, INPUT);
-	digitalWrite(6, LOW); // floating mode, pullup disabled
 	pinMode(7, INPUT);
 	digitalWrite(7, HIGH);
+	Wire.begin(20);
+	Wire.onReceive(recHandler);
+	Wire.onRequest(reqHandler);
 	Serial.begin(9600);
 	Serial.print("Setting stepper speed...");
 	myStepper.setSpeed(300);
@@ -56,18 +73,25 @@ void setup() {
 	move2bottom();
 	move2top();
 	Serial.println("Entering main loop");
-	while (1) {
-		while(digitalRead(6) != HIGH); // wait till pin 6 goes HIGH
-		flow(&myStepper);
-	}
 }
 
 void flow() {
 	move2bottom();
-	Serial.print("Sleeping...");
-	delay(2000);
+	Serial.print("Sleeping");
+	while (i2cmd--) {
+		Serial.print(".");
+		delay(1000);
+	}
 	Serial.println(" done");
 	move2top();
 }
 
-void loop() {}
+void loop() {
+	if (letgo) {
+		Serial.print("Received request CMD = ");
+		Serial.println(i2cmd);
+		Wire.send(i2cmd);
+		if (i2cmd != 0) flow();
+		letgo = 0;
+	}
+}
