@@ -1,0 +1,28 @@
+diff --git a/services/cron/cron_static.c b/services/cron/cron_static.c
+index 8d30e9d..0c66381 100644
+--- a/services/cron/cron_static.c
++++ b/services/cron/cron_static.c
+@@ -59,6 +59,15 @@ mcuf_modul(void)
+ }
+ #endif // MCUF_MODUL_CRON_SUPPORT
+ 
++#define HACK2O_I2C_ADDR 20
++
++void
++i2ctest()
++{
++	i2c_write_byte(HACK2O_I2C_ADDR, 2);
++	i2c_read_byte(HACK2O_I2C_ADDR);
++}
++
+ /* Cron configuration:
+  * Fields: Min Hour Day Month Dow
+  * Values:
+@@ -71,6 +80,7 @@ mcuf_modul(void)
+ 
+ struct cron_static_event_t events[] PROGMEM =
+ {
++  { { {-1, -1, -1, -1, -1} }, i2ctest, USE_LOCAL}, /* every minute  */
+ #ifdef MCUF_CLOCK_SUPPORT
+   { { {-1, -1, -1, -1, -1} }, mcuf_clock, USE_LOCAL}, /* every minute  */
+ #endif /* MCUF_CLOCK_SUPPORT */
