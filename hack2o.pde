@@ -48,11 +48,15 @@ void move2top() {
 }
 
 void recHandler(int numBytes) {
+	byte tmp;
+
 	Serial.print("Received ");
 	Serial.print(numBytes, DEC);
 	Serial.println(" bytes");
 	if (numBytes == 0) return;
-	i2cmd = Wire.receive();
+	while (numBytes--)
+		tmp = Wire.receive();
+	if (!letgo) i2cmd = tmp;
 }
 
 void reqHandler() {
