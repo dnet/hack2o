@@ -32,8 +32,8 @@
 #define HEIGHT 4800
 
 Stepper myStepper(100, 8, 10, 9, 11);
-int i2cmd;
-int letgo = 0;
+byte i2cmd;
+byte letgo = 0;
 
 void move2bottom() {
 	Serial.print("Moving to bottom position...");
