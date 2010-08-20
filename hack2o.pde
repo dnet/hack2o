@@ -35,15 +35,23 @@ Stepper myStepper(100, 8, 10, 9, 11);
 byte i2cmd;
 byte letgo = 0;
 
+void release_motor() {
+	Serial.print(" (motor off)");
+	for (byte i = 8; i < 12; i++)
+		digitalWrite(i, LOW);
+}
+
 void move2bottom() {
 	Serial.print("Moving to bottom position...");
 	while (digitalRead(7) == HIGH) myStepper.step(-25);
+	release_motor();
 	Serial.println(" done");
 }
 
 void move2top() {
 	Serial.print("Moving to top position...");
 	myStepper.step(HEIGHT);
+	release_motor();
 	Serial.println(" done");
 }
 
