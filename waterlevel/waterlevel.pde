@@ -51,7 +51,7 @@ void setup() {
 }
 
 void loop() {
-	Serial.println(readReg(), BIN);
+	Serial.println(getLevel(), DEC);
 	delay(1000);
 }
 
@@ -74,5 +74,12 @@ byte readReg() {
 		retval = (retval << 1) | (digitalRead(Q7) == HIGH ? 1 : 0);
 		execCmd(SHIFT);
 	}
+	return retval;
+}
+
+byte getLevel() {
+	byte retval = 0;
+	for (byte i = readReg(); i; i >>= 1)
+		retval++;
 	return retval;
 }
