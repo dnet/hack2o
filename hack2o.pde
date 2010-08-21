@@ -68,6 +68,7 @@ void recHandler(int numBytes) {
 }
 
 void reqHandler() {
+	Wire.send(i2cmd);
 	letgo = 1;
 }
 
@@ -102,7 +103,6 @@ void loop() {
 	if (letgo) {
 		Serial.print("Received request CMD = ");
 		Serial.println(i2cmd, DEC);
-		Wire.send(i2cmd);
 		if (i2cmd != 0) flow();
 		letgo = 0;
 	}
